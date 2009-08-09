@@ -1,8 +1,11 @@
 import config
 from dxhttp import deco, html, utils
 
-# static files
-from dxhttp.read import read
+
+# in a real world app you would make a importer of "app", not "dxhttp"
+# but the only external module that provides an app is dxhttp.read, so...
+get = utils.make_importer(locals(), 'dxhttp', True)
+get('read')
 
 def navbar(tpl):
     ul = tpl.html.filter(tag="ul", id="navbar")[0]

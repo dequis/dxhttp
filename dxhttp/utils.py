@@ -2,8 +2,31 @@ import config
 
 pre = lambda text: "<pre>%s</pre>" % text
 
-def get_mod(name, path=config.APPDIR):
-    return reload(__import__('.'.join([path, name]), globals(), locals(), ['main']))
+def get_mod(name, path=None, attrs=[]):
+    if path:
+        mod = __import__('.'.join([path, name]), fromlist=[''])
+    else:
+        mod = __import__(name)
+
+    if config.DEBUG:
+        mod = reload(mod)
+
+    if not attrs:
+        return mod
+    else:
+        return [getattr(mod, x) for x in attrs]
+
+def make_importer(locals, path=None, selftitled=False):
+    def get(name, *attrs):
+        if not attrs and selftitled:
+            attrs = [name]
+        ret = get_mod(name, path, attrs)
+        if attrs:
+            for attr in attrs:
+                locals[attr] = ret.pop(0)
+        else:
+            return ret
+    return get
 
 def get_mod_list(path=config.APPDIR):
     import glob, os
