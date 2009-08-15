@@ -5,6 +5,8 @@ import xml.dom.minidom
 import functools
 import os.path
 
+DOCTYPE = '<!DOCTYPE html>'
+
 class Base(object):
     def __init__(self, basetag='html', template=None):
 
@@ -28,7 +30,7 @@ class Base(object):
 
     def __iter__(self):
         '''Returns the value of this object as an iterator'''
-        return ['<!DOCTYPE html>', self.write_function(encoding="utf-8")].__iter__()
+        return [DOCTYPE, self.write_function(encoding="utf-8")].__iter__()
 
 def new(tag='html', template=None):
     return Base(tag, template)
@@ -97,5 +99,9 @@ class Element(object):
         '''Parses "filename" and appends it contents to self'''
         filename = os.path.join(TPL_ROOT, filename)
         self.appendChild(xml.dom.minidom.parse(filename).documentElement)
+
+    def html(self, html):
+        '''Appends html. Must be wrapped in some tag'''
+        self.appendChild(xml.dom.minidom.parseString(html).documentElement)
 
 extend(xml.dom.minidom.Element, Element)
