@@ -4,8 +4,8 @@ def is_post_request(environ):
     if environ['REQUEST_METHOD'].upper() != 'POST':
         return False
     content_type = environ.get('CONTENT_TYPE', 'application/x-www-form-urlencoded')
-    return (content_type.startswith('application/x-www-form-urlencoded'
-            or content_type.startswith('multipart/form-data')))
+    return (content_type.startswith('application/x-www-form-urlencoded')
+            or content_type.startswith('multipart/form-data'))
 
 def get_post_form(environ):
     assert is_post_request(environ)
