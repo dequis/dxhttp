@@ -2,6 +2,7 @@ from dxhttp.utils import extend
 from config import TPL_ROOT
 
 import xml.dom.minidom
+import functools
 import os.path
 
 class Base(object):
@@ -32,8 +33,22 @@ class Base(object):
 def new(tag='html', template=None):
     return Base(tag, template)
 
+def fix_attrs_names(f):
+    '''Internal decorator that replaces kwargs
+    with keys such as "class_" into "class"'''
+    @functools.wraps(f)
+    def wrapper(*args, **attrs):
+        for attr in attrs.copy():
+            if attr.endswith("_"):
+                attrs[attr[:-1]] = attrs[attr]
+                del attrs[attr]
+        return f(*args, attrs=attrs)
+    return wrapper
+
 class Element(object):
-    def tag(self, name, text=None, **attrs):
+
+    @fix_attrs_names
+    def tag(self, name, text=None, attrs={}):
         '''Appends to self a child tag of "name", with content "text"
         and attributes "kwds"'''
 
@@ -43,11 +58,8 @@ class Element(object):
         self.appendChild(tag)
         return tag
 
-    def attrs(self, **attrs):
-        if 'class_' in attrs:
-            attrs['class'] = attrs['class_']
-            del attrs['class_']
-
+    @fix_attrs_names
+    def attrs(self, attrs={}):
         for (name, value) in attrs.iteritems():
             self.setAttribute(name, value)
         
@@ -67,10 +79,8 @@ class Element(object):
     def getElementById(self, id):
         return self.filter(id=id)[0]
 
-    def filter(self, tag="*", **attrs):
-        if 'class_' in attrs:
-            attrs['class'] = attrs['class_']
-            del attrs['class_']
+    @fix_attrs_names
+    def filter(self, tag="*", attrs={}):
         def matches(x):
             for key, value in attrs.iteritems():
                 if x.getAttribute(key) == value:
