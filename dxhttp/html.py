@@ -5,7 +5,7 @@ import xml.dom.minidom
 import functools
 import os.path
 
-DOCTYPE = '<!DOCTYPE html>'
+DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
 
 class Base(object):
     def __init__(self, basetag='html', template=None):
@@ -50,7 +50,7 @@ def fix_attrs_names(f):
 class Element(object):
 
     @fix_attrs_names
-    def tag(self, name, text=None, attrs={}):
+    def add(self, name, text=None, attrs={}):
         '''Appends to self a child tag of "name", with content "text"
         and attributes "kwds"'''
 
@@ -67,7 +67,7 @@ class Element(object):
         
         return self
 
-    def text(self, text):
+    def addtext(self, text):
         '''Appends to self a text node of content "text"'''
         if text:
             if isinstance(text, str):
@@ -77,6 +77,10 @@ class Element(object):
             textnode = self.documentObject.createTextNode(text)
             self.appendChild(textnode)
         return self
+     
+    # backwards compatibility, these do not work with etree implementation
+    tag = add
+    text = addtext
 
     def getElementById(self, id):
         return self.filter(id=id)[0]
