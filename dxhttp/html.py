@@ -1,6 +1,5 @@
 from dxhttp.utils import extend
-from dxhttp import replacer; reload(replacer)
-Replacer = replacer.Replacer
+from dxhttp.replacer import Replacer 
 from config import TPL_ROOT
 
 import xml.dom.minidom

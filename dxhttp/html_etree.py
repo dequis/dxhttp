@@ -8,6 +8,7 @@ API differences:
 '''
 
 from dxhttp.utils import extend
+from dxhttp.replacer import Replacer 
 from config import TPL_ROOT
 
 import xml.etree.ElementTree as ET
