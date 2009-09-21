@@ -23,11 +23,15 @@ def headers(**kwds):
             if 'dxhttp.headers' in environ:
                 headers += environ['dxhttp.headers']
             
+            status = environ.get('dxhttp.status', '200 OK')
+            
             for key, value in baseheaders:
                 if key.lower() not in [x[0].lower() for x in headers]:
                     headers.append((key, value))
+            
+            assert appiter is not None
 
-            start_response('200 OK', headers)
+            start_response(status, headers)
             for item in appiter: 
                 yield item
         return wrapper
