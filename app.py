@@ -1,6 +1,11 @@
 import config
 from dxhttp import deco, html, utils
 
+MAP = [
+    (r'^$', 'index'),
+    (r'^demo/([A-Za-z0-9\._\-]*)\.py$', 'get_demo'),
+    (r'(^(img|css|js)/[A-Za-z0-9\._\-]*)', 'read'),
+]
 
 # in a real world app you would make a importer of "app", not "dxhttp"
 # but the only external module that provides an app is dxhttp.read, so...

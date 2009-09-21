@@ -9,12 +9,6 @@ import config
 import dxhttp.utils
 import dxhttp.exc
 
-MAP = [
-    (r'^$', 'index'),
-    (r'^demo/([A-Za-z0-9\._\-]*)\.py$', 'get_demo'),
-    (r'(^(img|css|js)/[A-Za-z0-9\._\-]*)', 'read'),
-]
-
 @dxhttp.exc.ExceptionMiddleware
 def application(environ, start_response):
     get = environ.get
@@ -27,7 +21,7 @@ def application(environ, start_response):
     reload(app)
 
     path = environ.get('PATH_INFO', '').lstrip('/')
-    for regex, func in MAP:
+    for regex, func in app.MAP:
         match = re.search(regex, path)
         if match is not None:
             environ['dxhttp.args'] = match.groups()
