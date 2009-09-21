@@ -19,10 +19,11 @@ import os.path
 DOCTYPE = '<!DOCTYPE html>'
 
 class Base(object):
-    def __init__(self, basetag='html', template=None):
+    def __init__(self, basetag='html', template=None, vars={}):
         
         if template:
-            self.document = ET.parse(os.path.join(TPL_ROOT, template))
+            f = Replacer(os.path.join(TPL_ROOT, template), vars)
+            self.document = ET.parse(f)
         else:
             self.document = ET.ElementTree(ET.Element(basetag))
 
@@ -101,10 +102,10 @@ class Element:
 
         return [x for x in self.getiterator(tag) if matches(x)]
 
-    def template(self, filename):
+    def template(self, filename, vars={}):
         '''Parses "filename" and appends it contents to self'''
-        filename = os.path.join(TPL_ROOT, filename)
-        self.append(ET.XML(open(filename).read()))
+        f = Replacer(os.path.join(TPL_ROOT, filename), vars)
+        self.append(ET.XML(f.read()))
 
     def html(self, html):
         '''Appends html. Must be wrapped in some tag'''

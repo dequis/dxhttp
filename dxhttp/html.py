@@ -1,4 +1,6 @@
 from dxhttp.utils import extend
+from dxhttp import replacer; reload(replacer)
+Replacer = replacer.Replacer
 from config import TPL_ROOT
 
 import xml.dom.minidom
@@ -8,10 +10,11 @@ import os.path
 DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
 
 class Base(object):
-    def __init__(self, basetag='html', template=None):
+    def __init__(self, basetag='html', template=None, vars={}):
 
         if template:
-            self.document = xml.dom.minidom.parse(os.path.join(TPL_ROOT, template))
+            f = Replacer(os.path.join(TPL_ROOT, template), vars)
+            self.document = xml.dom.minidom.parse(f)
         else:
             self.document = xml.dom.minidom.getDOMImplementation() \
                 .createDocument(None, basetag, None)
@@ -32,8 +35,8 @@ class Base(object):
         '''Returns the value of this object as an iterator'''
         return [DOCTYPE, self.write_function(encoding="utf-8")].__iter__()
 
-def new(tag='html', template=None):
-    return Base(tag, template)
+def new(tag='html', template=None, vars={}):
+    return Base(tag, template, vars)
 
 def fix_attrs_names(f):
     '''Internal decorator that replaces kwargs
@@ -95,14 +98,17 @@ class Element(object):
                     return True
             return False
 
+        if not attrs:
+            matches = lambda x: True
+
         return [x for x in
             self.getElementsByTagName(tag)
             if matches(x)]
 
-    def template(self, filename):
+    def template(self, filename, vars={}):
         '''Parses "filename" and appends it contents to self'''
-        filename = os.path.join(TPL_ROOT, filename)
-        self.appendChild(xml.dom.minidom.parse(filename).documentElement)
+        f = Replacer(os.path.join(TPL_ROOT, filename), vars)
+        self.appendChild(xml.dom.minidom.parse(f).documentElement)
 
     def html(self, html):
         '''Appends html. Must be wrapped in some tag'''
