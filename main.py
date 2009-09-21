@@ -3,6 +3,7 @@
 import re
 import sys
 import cgi
+import Cookie
 
 import config
 import dxhttp.utils
@@ -16,8 +17,11 @@ MAP = [
 
 @dxhttp.exc.ExceptionMiddleware
 def application(environ, start_response):
-    query_string = cgi.parse_qs(environ.get('QUERY_STRING', None))
-    environ['dxhttp.query_string'] = query_string
+    get = environ.get
+    environ['dxhttp.query_string'] = cgi.parse_qs(get('QUERY_STRING', ''))
+    environ['dxhttp.cookies'] = Cookie.BaseCookie(get('HTTP_COOKIE', ''))
+    environ['dxhttp.status'] = "200 OK"
+    environ['dxhttp.headers'] = []
 
     import app
     reload(app)
