@@ -56,7 +56,7 @@ def fix_attrs_names(f):
             if attr.endswith("_"):
                 attrs[attr[:-1]] = attrs[attr]
                 del attrs[attr]
-        return f(*args, attrs=attrs)
+        return f(attrs=attrs, *args)
     return wrapper
 
 class Element:

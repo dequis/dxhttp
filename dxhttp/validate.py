@@ -31,6 +31,6 @@ def post(fields=[], ints=[], notnull=[]):
                     except ValueError:
                         raise FormValidationException('Field %s must be int' % field)
 
-            return f(environ, start_response, *args, form=newform, **kwargs)
+            return f(environ, start_response, newform, *args, **kwargs)
         return wrapper
     return decorator
