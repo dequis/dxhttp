@@ -22,4 +22,7 @@ def Replacer(template, vars):
         else:
             return ''.join(match.groups())
 
-    return StringIO(regexp.sub(handle, template.read()))
+    if not vars:
+        return template
+    else:
+        return StringIO(regexp.sub(handle, template.read()))
