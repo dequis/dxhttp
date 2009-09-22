@@ -1,4 +1,7 @@
-from StringIO import StringIO
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 import re
 
 regexp = re.compile(r'([^\\])\$([A-Za-z]+|{.+?})') # oh shi-
