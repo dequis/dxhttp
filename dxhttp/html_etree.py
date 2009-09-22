@@ -105,8 +105,13 @@ class Element:
 
     def template(self, filename, vars={}):
         '''Parses "filename" and appends it contents to self'''
-        f = Replacer(os.path.join(TPL_ROOT, filename), vars)
-        self.append(ET.XML(f.read()))
+        path = os.path.join(TPL_ROOT, filename) 
+        if os.path.exists(path):
+            f = Replacer(path, vars)
+            self.append(ET.XML(f.read()))
+            return True
+        else:
+            return False
 
     def html(self, html):
         '''Appends html. Must be wrapped in some tag'''

@@ -106,8 +106,13 @@ class Element(object):
 
     def template(self, filename, vars={}):
         '''Parses "filename" and appends it contents to self'''
-        f = Replacer(os.path.join(TPL_ROOT, filename), vars)
-        self.appendChild(xml.dom.minidom.parse(f).documentElement)
+        path = os.path.join(TPL_ROOT, filename) 
+        if os.path.exists(path):
+            f = Replacer(path, vars)
+            self.appendChild(xml.dom.minidom.parse(f).documentElement)
+            return True
+        else:
+            return False
 
     def html(self, html):
         '''Appends html. Must be wrapped in some tag'''
