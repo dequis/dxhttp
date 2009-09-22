@@ -36,6 +36,8 @@ def mail(to="", subject="", text="", html=True, **headers):
                                           value.replace("\n", "")))
     process.stdin.write("\n")
     process.stdin.write(text)
+    process.stdin.flush()
+    process.stdin.close()
     return process.wait() == 0
 
 valid_re = re.compile('^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$', re.I)
