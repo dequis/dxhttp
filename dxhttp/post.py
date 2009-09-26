@@ -8,13 +8,17 @@ def is_post_request(environ):
             or content_type.startswith('multipart/form-data'))
 
 def get_post_form(environ):
-    assert is_post_request(environ)
+    if not is_post_request(environ):
+        return None
+
     input = environ['wsgi.input']
     post_form = environ.get('wsgi.post_form')
     if post_form:
         return post_form
+
     # This must be done to avoid a bug in cgi.FieldStorage
     environ.setdefault('QUERY_STRING', '')
+
     fs = cgi.FieldStorage(fp=input,
                           environ=environ,
                           keep_blank_values=1)
