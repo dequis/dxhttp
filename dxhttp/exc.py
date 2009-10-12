@@ -48,7 +48,7 @@ def MailExceptionMiddleware(mail, error_message):
                     pass
                 yield error_message
 
-                subject = "%s: %s" % (environ["SERVER_NAME"], exception.split("\n")[-1])
+                subject = "%s: %s" % (environ["SERVER_NAME"], exception.strip().split("\n")[-1])
                 dump =  '\n'.join([': '.join(map(str, x)) for x in environ.items()])
                 text = '%s\n\nEnviron dump:\n%s' % (exception, dump)
                 sendmail.mail(to=mail, subject=subject, text=text, html=False)
