@@ -2,22 +2,18 @@ import os
 import cgi
 import glob
 import traceback
+import functools
 import cStringIO as StringIO
 
 from dxhttp import utils
 import config
 
-class RogerExceptionMiddleware(object):
-    '''Exception Middelware'''
-
-    def __init__(self, app, _bool=True):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        '''catch exceptions'''
+def RogerExceptionMiddleware(app):
+    @functools.wraps(app)
+    def wrapper(environ, start_response):
         appiter = None
         try:
-            appiter = self.app(environ, start_response)
+            appiter = app(environ, start_response)
             for item in appiter:
                 yield item
         except:
@@ -32,15 +28,13 @@ class RogerExceptionMiddleware(object):
 
         if hasattr(appiter, 'close'):
             appiter.close()
-
+    return wrapper
 
 if config.DEBUG:
     try:
-        from werkzeug import DebuggedApplication
-        # replace
-        ExceptionMiddleware = DebuggedApplication
+        from werkzeug import DebuggedApplication as ExceptionMiddleware
     except ImportError:
         ExceptionMiddleware = RogerExceptionMiddleware
 else:
     # debug disabled
-    ExceptionMiddleware = lambda app, _bool: app
+    ExceptionMiddleware = lambda app: app
