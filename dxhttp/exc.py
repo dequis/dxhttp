@@ -8,10 +8,12 @@ import cStringIO as StringIO
 from dxhttp import utils
 import config
 
+STATUS = '500 INTERNAL SERVER ERROR'
+HEADERS = [('Content-Type', 'text/plain')]
+
 def RogerExceptionMiddleware(app):
     @functools.wraps(app)
     def wrapper(environ, start_response):
-        appiter = None
         try:
             appiter = app(environ, start_response)
             for item in appiter:
@@ -19,15 +21,11 @@ def RogerExceptionMiddleware(app):
         except:
             exception = traceback.format_exc()
             try:
-                start_response('500 INTERNAL SERVER ERROR', [
-                               ('Content-Type', 'text/plain')])
+                start_response(STATUS, HEADERS)
             except:
                 yield '<pre>\n'
 
             yield exception
-
-        if hasattr(appiter, 'close'):
-            appiter.close()
     return wrapper
 
 if config.DEBUG:
