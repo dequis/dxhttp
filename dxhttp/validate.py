@@ -60,7 +60,8 @@ def _validate(environ, method, fields, ints, notnull):
             try:
                 newform[field] = int(newform[field])
             except ValueError:
-                raise FormValidationException('Field %s must be int' % field)
+                if len(str(newform[field])) != 0:
+                    raise FormValidationException('Field %s must be int' % field)
     return newform
 
 def deco(method, fields=[], ints=[], notnull=[], doraise=False):
