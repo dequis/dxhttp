@@ -53,7 +53,7 @@ def _validate(environ, method, fields, ints, notnull):
             newform[field] = ''
 
         if field in notnull and \
-           newform[field] is None or len(str(newform[field])) == 0:
+           (newform[field] is None or len(str(newform[field])) == 0):
             raise FormValidationException('Field %s required' % field)
 
         if field in ints:
