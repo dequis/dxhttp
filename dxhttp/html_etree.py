@@ -44,8 +44,8 @@ class Base(object):
         '''Returns the value of this object as an iterator'''
         return [DOCTYPE, self.write_function(self.html, encoding="utf-8")].__iter__()
 
-def new(tag='html', template=None):
-    return Base(tag, template)
+def new(tag='html', template=None, vars={}):
+    return Base(tag, template, vars)
 
 def fix_attrs_names(f):
     '''Internal decorator that replaces kwargs
