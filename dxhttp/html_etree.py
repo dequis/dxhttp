@@ -11,11 +11,14 @@ from dxhttp.utils import extend
 from dxhttp.replacer import Replacer 
 from config import TPL_ROOT
 
+from subprocess import Popen, PIPE
+from xml.parsers.expat import ExpatError
 import xml.etree.ElementTree as ET
 import xml.etree.cElementTree as cET
 import xml.dom.minidom
 import functools
 import os.path
+import re
 
 DOCTYPE = '<!DOCTYPE html>'
 
@@ -58,6 +61,47 @@ def fix_attrs_names(f):
                 del attrs[attr]
         return f(attrs=attrs, *args)
     return wrapper
+
+XMLNS_RE = re.compile('^<html xmlns.*$', re.M)
+
+def XML_safe(html, filename=None):
+    '''Tries to read a string with ET.XML, and if it fails, pass it
+    through html tidy, addressing common xml parsing errors.
+    If a filename is specified, html is read from there, and written back.
+    If the html string is clean (no ExpatError), this is the same as ET.XML'''
+    
+    try:
+        return ET.XML(html)  
+    except ExpatError:
+        pass
+        
+    if filename:
+        # don't save back replaced variables
+        # caveat: we output without replacement...
+        html = open(filename).read()
+    
+    # -n numeric entities, -q quiet
+    # --input-encoding utf8, but still output as numeric entities
+    # --output-xml 1, close tags such as <br />, but don't enforce XHTML            
+    tidy = Popen(['tidy', '-nq', '--input-encoding', 'utf8', '--output-xml', '1'], stdin=PIPE, stdout=PIPE, stderr=PIPE)    
+    stdout, stderr = tidy.communicate(html)
+
+    # remove xmlns to avoid having it in every attribute
+    # ...and parse that string as XML
+    newxml = ET.XML(XMLNS_RE.sub('<html>', stdout))
+    
+    # ignore html and head
+    body = newxml.find("body")
+    body.tag = 'div'
+    if len(body) == 1 and body[0].tag == 'div':
+        # avoid having multiple divs as body
+        body = body[0]
+    
+    if filename:
+        # write the clean document back
+        open(filename, "w").write(ET.tostring(body))
+        
+    return body        
 
 class Element:
     @fix_attrs_names
@@ -108,13 +152,13 @@ class Element:
         path = os.path.join(TPL_ROOT, filename) 
         if os.path.exists(path):
             f = Replacer(path, vars)
-            self.append(ET.XML(f.read()))
+            self.append(XML_safe(f.read(), path))
             return True
         else:
             return False
 
     def html(self, html):
         '''Appends html. Must be wrapped in some tag'''
-        self.append(ET.XML(html))
+        self.append(XML_safe(html))
 
 extend(ET._ElementInterface, Element)
