@@ -27,7 +27,7 @@ import dxhttp.post
 class FormValidationException(Exception):
     pass
 
-def _validate(environ, method, fields, ints, notnull):
+def _validate(environ, method, fields, ints, notnull, dicts):
     '''Validates a form a returns a dict with the values
     
     -method: POST or GET
@@ -62,14 +62,21 @@ def _validate(environ, method, fields, ints, notnull):
             except ValueError:
                 if len(str(newform[field])) != 0:
                     raise FormValidationException('Field %s must be int' % field)
+    
+    for basename in dicts:
+        newform[basename] = {}
+        for field in form.keys():
+            if field.startswith(basename + "["):
+                key = field.split("[")[1].split("]")[0]
+                newform[basename][key] = form[field].value
     return newform
 
-def deco(method, fields=[], ints=[], notnull=[], doraise=False):
+def deco(method, fields=[], ints=[], notnull=[], dicts=[], doraise=False):
     def decorator(f):
         @functools.wraps(f)
         def wrapper(environ, start_response, *args, **kwargs):
             try:
-                newform = _validate(environ, method, fields, ints, notnull)
+                newform = _validate(environ, method, fields, ints, notnull, dicts)
             except FormValidationException, e:
                 if doraise:
                     raise
@@ -79,8 +86,8 @@ def deco(method, fields=[], ints=[], notnull=[], doraise=False):
         return wrapper
     return decorator
 
-def post(fields=[], ints=[], notnull=[], doraise=False):
-    return deco('POST', fields, ints, notnull, doraise)
+def post(fields=[], ints=[], notnull=[], dicts=[], doraise=False):
+    return deco('POST', fields, ints, notnull, dicts, doraise)
 
-def get(fields=[], ints=[], notnull=[], doraise=False):
-    return deco('GET', fields, ints, notnull, doraise)
+def get(fields=[], ints=[], notnull=[], dicts=[], doraise=False):
+    return deco('GET', fields, ints, notnull, dicts, doraise)
