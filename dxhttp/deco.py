@@ -14,26 +14,32 @@ def headers(**kwds):
         key = key.replace("_", "-")
         baseheaders.append((key, value))
 
+    def merge_headers(e):
+        e.setdefault('dxhttp.headers', [])
+        
+        for key, value in baseheaders:
+            if key.lower() not in [x[0].lower() for x in e['dxhttp.headers']]:
+                e['dxhttp.headers'].append((key, value))
+
+        return e['dxhttp.headers']
+
     def decorator(f):
         @functools.wraps(f)
         def wrapper(environ, start_response, *args, **kwargs):
             appiter = f(environ, start_response, *args, **kwargs)
+            headers = merge_headers(environ)
 
-            headers = []
-            if 'dxhttp.headers' in environ:
-                headers += environ['dxhttp.headers']
+            if 'dxhttp.decorated' in environ:
+                return appiter
+            environ['dxhttp.decorated'] = True
             
             status = environ.get('dxhttp.status', '200 OK')
             
-            for key, value in baseheaders:
-                if key.lower() not in [x[0].lower() for x in headers]:
-                    headers.append((key, value))
-            
-            assert appiter is not None
+            if appiter is None:
+                appiter = ['None']
 
             start_response(status, headers)
-            for item in appiter: 
-                yield item
+            return appiter
         return wrapper
     return decorator
 
