@@ -31,8 +31,9 @@ def application(environ, start_response):
     return '404 Not found'
 
 
-def main():
-    mod = (len(sys.argv) > 1) and sys.argv[1] or config.SERVER_MODULE
+def main(mod=None):
+    if mod is None:
+        mod = (len(sys.argv) > 1) and sys.argv[1] or config.SERVER_MODULE
     dxhttp.utils.get_mod(mod, 'dxhttp.srv').WSGIServer().run(application)
 
 if __name__ == '__main__':
