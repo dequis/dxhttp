@@ -16,6 +16,7 @@ SKELETON = {
     'files': ['main.py', 'config.py', 'app.py'],
 }
 
+FCGI_MODE = 0755
 
 def main():
     parser = optparse.OptionParser()
@@ -55,8 +56,12 @@ def main():
         if options.python_binary:
             fcgi = fcgi.replace('/usr/bin/env python', options.python_binary)
         
-        open(os.path.join(projectpath, projectfcgi), "w").write(fcgi)
+        projectfcgipath = os.path.join(projectpath, projectfcgi)
+        open(projectfcgipath, "w").write(fcgi)
         print "Created %s" % projectfcgi
+        
+        os.chmod(projectfcgipath, FCGI_MODE)
+        print "Set mode %o for %s" % (FCGI_MODE, projectfcgi)
         
         htaccess = resource_string(dxhttp, '.htaccess').replace(dxhttpfcgi, projectfcgi)
         open(os.path.join(projectpath, '.htaccess'), "w").write(htaccess)
