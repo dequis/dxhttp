@@ -1,3 +1,6 @@
+AddHandler fastcgi-script .fcgi
+Options +ExecCGI
+
 RewriteEngine on
 RewriteRule ^$ dxhttp.fcgi [QSA,L]
 RewriteCond %{REQUEST_FILENAME} !-f
