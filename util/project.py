@@ -21,7 +21,8 @@ def main():
     parser = optparse.OptionParser()
     parser.add_option("-n", "--new", action="store_true")
     parser.add_option("-d", "--directory")
-    parser.add_option("-l", "--jslib", action="append")
+    parser.add_option("-l", "--jslib", action="append", default=[])
+    parser.add_option("-p", "--python-binary")
 
     options, args = parser.parse_args()
 
@@ -49,10 +50,12 @@ def main():
         
         projectfcgi = '%s.fcgi' % project
         dxhttpfcgi = 'dxhttp.fcgi'
-        shutil.copy(
-            resource_filename(dxhttp, dxhttpfcgi),
-            os.path.join(projectpath, projectfcgi)
-        )
+        
+        fcgi = resource_string(dxhttp, dxhttpfcgi)
+        if options.python_binary:
+            fcgi = fcgi.replace('/usr/bin/env python', options.python_binary)
+        
+        open(os.path.join(projectpath, projectfcgi), "w").write(fcgi)
         print "Created %s" % projectfcgi
         
         htaccess = resource_string(dxhttp, '.htaccess').replace(dxhttpfcgi, projectfcgi)
