@@ -1,3 +1,3 @@
 #!/usr/bin/env python
-import main
-main.main('fcgi')
+import dxhttp.main
+dxhttp.main.start_server('fcgi')

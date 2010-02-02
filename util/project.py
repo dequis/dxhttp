@@ -13,7 +13,7 @@ LIBS = {
 
 SKELETON = {
     'dirs': ['', 'templates', 'css', 'images', 'js'],
-    'files': ['main.py', 'config.py', 'app.py'],
+    'files': ['config.py', 'app.py'],
 }
 
 FCGI_MODE = 0755
