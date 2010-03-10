@@ -21,7 +21,7 @@ def Replacer(template, vars):
         blank, key = match.groups()
         key = key.strip("{}")
         if key in vars:
-            return blank + str(vars[key])
+            return blank + unicode(vars[key]).encode("utf8")
         else:
             return ''.join(match.groups())
 
