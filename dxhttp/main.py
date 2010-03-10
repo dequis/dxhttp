@@ -1,13 +1,9 @@
-#!/usr/bin/python
-
 import re
-import sys
 import cgi
+import sys
 import Cookie
-
-import config
-import dxhttp.utils
 import dxhttp.exc
+import dxhttp.utils
 
 @dxhttp.exc.ExceptionMiddleware
 def application(environ, start_response):
@@ -30,10 +26,13 @@ def application(environ, start_response):
     start_response('404 Not found', [('content-type', 'text/plain')])
     return '404 Not found'
 
+def start_server(module):
+    dxhttp.utils.get_mod(module, 'dxhttp.srv').WSGIServer().run(application)
 
 def main():
+    import config
     mod = (len(sys.argv) > 1) and sys.argv[1] or config.SERVER_MODULE
-    dxhttp.utils.get_mod(mod, 'dxhttp.srv').WSGIServer().run(application)
+    start_server(mod)
 
 if __name__ == '__main__':
     main()
