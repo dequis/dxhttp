@@ -73,9 +73,9 @@ class Element(object):
         '''Appends to self a text node of content "text"'''
         if text:
             if isinstance(text, str):
-                text = text.decode("utf-8")
+                text = text.decode("utf-8", "replace")
             elif not isinstance(text, unicode):
-                text = str(text).decode("utf-8")
+                text = str(text).decode("utf-8", "replace")
             textnode = self.documentObject.createTextNode(text)
             self.appendChild(textnode)
         return self
