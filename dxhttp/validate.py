@@ -48,7 +48,10 @@ def _validate(environ, method, fields, ints, notnull, dicts):
     newform = {}
     for field in fields:
         try:
-            newform[field] = form[field].value
+            if type(form[field]) == list:
+                newform[field] = form[field][0].value
+            else:
+                newform[field] = form[field].value
         except KeyError:
             newform[field] = ''
 
