@@ -16,6 +16,9 @@ def application(environ, start_response):
     import app
     reload(app)
 
+    if hasattr(app, 'app_plug'):
+        app.app_plug(environ, start_response)
+
     path = environ.get('PATH_INFO', '').lstrip('/')
     for regex, func in app.MAP:
         match = re.search(regex, path)
