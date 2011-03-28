@@ -41,7 +41,14 @@ def mail(to="", subject="", text="", html=True, **headers):
     return process.wait() == 0
 
 valid_re = re.compile('^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$', re.I)
+valid2_re = re.compile('^.* <(.*)>$')
 def is_valid_email(email):
     '''Regexp stolen from "somewhere"'''
-    return valid_re.match(email) is not None
+    if valid_re.match(email) is not None:
+        return True
+    else:
+        matchobj = valid2_re.match(email)
+        if matchobj is not None:
+            return valid_re.match(matchobj.group(1)) is not None
+    return False
 
