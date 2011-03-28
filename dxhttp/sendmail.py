@@ -44,6 +44,7 @@ valid_re = re.compile('^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z
 valid2_re = re.compile('^[\w \.\'"-]* <(.*)>$', re.UNICODE)
 def is_valid_email(email):
     '''Regexp stolen from "somewhere"'''
+    email = email.decode("utf-8", "replace")
     if valid_re.match(email) is not None:
         return True
     else:
